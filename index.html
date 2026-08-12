@@ -1159,26 +1159,46 @@ function renderChips() {
 
 function sqlExample(e) {
   const n = e.name.toLowerCase();
+  // Every example below mirrors the displayed formula. These are intentionally
+  // expressions over source components, never SELECTs of an already-calculated metric.
   const examples = {
     "paid loss": `SELECT SUM(indemnity_paid) AS paid_loss\nFROM claim_payment\nWHERE payment_date <= :as_of_date;`,
     "paid lae": `SELECT SUM(alae_paid + ulae_paid) AS paid_lae\nFROM claim_expense_payment\nWHERE payment_date <= :as_of_date;`,
     "paid loss & lae": `SELECT SUM(indemnity_paid + alae_paid + ulae_paid) AS paid_loss_lae\nFROM claim_payment\nWHERE payment_date <= :as_of_date;`,
-    "case reserve / case outstanding": `SELECT SUM(case_reserve) AS case_reserve\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
-    "case incurred": `SELECT SUM(indemnity_paid + case_reserve) AS case_incurred\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
-    "net paid (of recoveries)": `SELECT SUM(paid_loss - salvage - subrogation) AS net_paid\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
-    "ultimate loss": `SELECT SUM(paid_loss + case_reserve + ibnr) AS ultimate_loss\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
-    "total unpaid / outstanding": `SELECT SUM(case_reserve + ibnr) AS total_unpaid\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
-    "gross / ceded / net": `SELECT gross_loss, ceded_loss,\n       gross_loss - ceded_loss AS net_loss\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
-    "net written premium": `SELECT gross_written_premium - ceded_written_premium\n       AS net_written_premium\nFROM premium_fact;`,
-    "net earned premium": `SELECT gross_earned_premium - ceded_earned_premium\n       AS net_earned_premium\nFROM premium_fact;`,
-    "loss ratio": `SELECT SUM(incurred_loss) / NULLIF(SUM(earned_premium), 0)\n       AS loss_ratio\nFROM insurance_monthly;`,
-    "frequency": `SELECT COUNT(DISTINCT claim_id) / NULLIF(SUM(exposure), 0)\n       AS frequency\nFROM claim_fact;`,
-    "severity": `SELECT SUM(incurred_loss) / NULLIF(COUNT(DISTINCT claim_id), 0)\n       AS severity\nFROM claim_fact;`,
-    "pure premium": `SELECT SUM(incurred_loss) / NULLIF(SUM(exposure), 0)\n       AS pure_premium\nFROM insurance_monthly;`,
-    "combined ratio": `SELECT (SUM(incurred_loss_lae) + SUM(underwriting_expense))\n       / NULLIF(SUM(earned_premium), 0) AS combined_ratio\nFROM insurance_monthly;`,
-    "inforce": `SELECT COUNT(DISTINCT policy_id) AS inforce_policies\nFROM policy_snapshot\nWHERE effective_date <= :as_of_date\n  AND expiration_date > :as_of_date\n  AND cancelled_flag = 0;`
+    "case reserve / case outstanding": `SELECT SUM(adjuster_estimated_unpaid) AS case_reserve\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "case incurred": `SELECT SUM(indemnity_paid + adjuster_estimated_unpaid) AS case_incurred\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "recoveries (salvage, subrogation)": `SELECT SUM(gross_amount - salvage - subrogation) AS net_of_recoveries\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "net paid (of recoveries)": `SELECT SUM(paid - salvage - subrogation) AS net_paid\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "net case incurred (of recoveries)": `SELECT SUM((paid - recoveries) + (case_reserve - recovery_reserves)) AS net_case_incurred\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "lae": `SELECT SUM(alae + ulae) AS lae\nFROM claim_expense_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "ibnr": `SELECT SUM(ultimate - (paid + case_reserve)) AS ibnr\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "ibner": `SELECT SUM(expected_ultimate_on_reported - (paid + case_reserve)) AS ibner\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date\n  AND reported_claim_flag = 1;`,
+    "total reserve / unpaid": `SELECT SUM(case_reserve + ibnr) AS total_reserve\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "ultimate loss": `SELECT SUM(paid + case_reserve + ibnr) AS ultimate\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "incurred loss & lae (ultimate)": `SELECT SUM((paid + case_reserve + ibnr) + ultimate_lae) AS ultimate_loss_lae\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "gross": `SELECT SUM(direct_amount + assumed_amount) AS gross\nFROM insurance_fact\nWHERE evaluation_date = :as_of_date;`,
+    "ceded": `SELECT SUM(amount_transferred_to_reinsurers) AS ceded\nFROM reinsurance_fact\nWHERE evaluation_date = :as_of_date;`,
+    "net (of reinsurance)": `SELECT SUM(gross_amount - ceded_amount) AS net_amount\nFROM insurance_fact\nWHERE evaluation_date = :as_of_date;`,
+    "assumed": `SELECT SUM(direct_written + assumed_written) AS gross_written\nFROM premium_fact;`,
+    "quota share": `SELECT SUM(qs_pct * subject_amount) AS ceded,\n       SUM((1 - qs_pct) * subject_amount) AS cedant_keeps\nFROM reinsurance_fact;`,
+    "excess of loss (xol)": `SELECT SUM(LEAST(limit_amount, GREATEST(0, loss - attachment))) AS reinsurer_pays\nFROM reinsurance_fact;`,
+    "ceding commission": `SELECT SUM(commission_rate * ceded_premium) AS ceding_commission\nFROM reinsurance_fact;`,
+    "gross written premium (gwp/gpw)": `SELECT SUM(direct_written + assumed_written) AS gwp\nFROM premium_fact;`,
+    "net written premium (nwp)": `SELECT SUM(gross_written - ceded_written) AS nwp\nFROM premium_fact;`,
+    "earned premium (gep/ep)": `SELECT SUM(written_premium - change_in_unearned) AS earned_premium\nFROM premium_period;`,
+    "unearned premium (upr/uep)": `SELECT SUM(written - earned) AS upr\nFROM premium_period;`,
+    "loss ratio": `SELECT SUM(incurred_loss) / NULLIF(SUM(earned_premium), 0) AS loss_ratio\nFROM insurance_monthly;`,
+    "expense ratio": `SELECT SUM(underwriting_expenses) / NULLIF(SUM(written_premium), 0) AS expense_ratio\nFROM insurance_monthly;`,
+    "combined ratio": `SELECT (SUM(incurred_loss) / NULLIF(SUM(earned_premium), 0))\n     + (SUM(underwriting_expenses) / NULLIF(SUM(written_premium), 0)) AS combined_ratio\nFROM insurance_monthly;`,
+    "frequency": `SELECT COUNT(DISTINCT claim_id) / NULLIF(SUM(exposure), 0) AS frequency\nFROM claim_fact;`,
+    "severity": `SELECT SUM(total_loss) / NULLIF(COUNT(DISTINCT claim_id), 0) AS severity\nFROM claim_fact;`,
+    "pure premium": `SELECT SUM(incurred_loss) / NULLIF(SUM(exposure), 0) AS pure_premium\nFROM claim_fact;`,
+    "inforce": `SELECT COUNT(DISTINCT policy_id) AS inforce\nFROM policy_snapshot\nWHERE effective_date <= :as_of_date\n  AND expiration_date > :as_of_date\n  AND cancelled_flag = 0;`,
+    "report lag": `SELECT AVG(report_date - accident_date) AS report_lag\nFROM claim_fact;`,
+    "hit ratio / close ratio": `SELECT SUM(CASE WHEN bound_flag = 1 THEN 1 ELSE 0 END)\n       / NULLIF(COUNT(*), 0) AS hit_ratio\nFROM quote_fact;`,
+    "book retention / premium retention": `SELECT SUM(renewed_premium) / NULLIF(SUM(expiring_premium), 0)\n       AS book_retention\nFROM renewal_fact;`
   };
-  return examples[n] || (e.formula ? `-- Illustrative grain: ${e.name}\nSELECT ${e.formula.split("=")[0].trim() || "metric"}\nFROM insurance_fact\nWHERE evaluation_date = :as_of_date;` : null);
+  return examples[n] || null;
 }
 
 function sqlHighlight(text) {
