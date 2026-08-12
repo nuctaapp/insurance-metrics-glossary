@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Insurance Metrics Glossary</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --bg-elevated: #1a222d;
+    --bg-card: #1e2836;
+    --bg-chip: #243044;
+    --bg-chip-active: #3b82f6;
+    --border: #2d3a4d;
+    --text: #e8eef6;
+    --text-muted: #8b9cb3;
+    --text-dim: #6b7c93;
+    --accent: #3b82f6;
+    --accent-soft: rgba(59, 130, 246, 0.15);
+    --gotcha: #f59e0b;
+    --gotcha-bg: rgba(245, 158, 11, 0.12);
+    --formula-bg: #0d1117;
+    --formula-border: #30363d;
+    --formula-text: #7ee787;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    min-height: 100dvh;
+    padding-bottom: calc(2rem + var(--safe-bottom));
+  }
+
+  /* Sticky header */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    padding: calc(0.75rem + var(--safe-top)) 1rem 0.75rem;
+    box-shadow: var(--shadow);
+  }
+
+  .header-inner { max-width: 720px; margin: 0 auto; }
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 0.85rem;
+    width: 18px;
+    height: 18px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    padding: 0.75rem 2.75rem 0.75rem 2.6rem;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+
+  #search:focus { border-color: var(--accent); }
+  #search::placeholder { color: var(--text-dim); }
+
+  #clear-btn {
+    position: absolute;
+    right: 0.4rem;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  #clear-btn:hover, #clear-btn:active { background: var(--bg-chip); color: var(--text); }
+  #clear-btn.visible { display: flex; }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.65rem 0 0.15rem;
+    margin: 0 -0.15rem;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+
+  .chip {
+    flex-shrink: 0;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-chip);
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 36px;
+  }
+
+  .chip:hover { border-color: var(--accent); color: var(--text); }
+  .chip.active {
+    background: var(--bg-chip-active);
+    border-color: var(--bg-chip-active);
+    color: #fff;
+  }
+
+  /* Main */
+  .main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  /* Decode checklist */
+  .decode {
+    background: var(--accent-soft);
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .decode h2 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .decode-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.15rem;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .decode-grid .sep {
+    color: var(--text-dim);
+    margin: 0 0.15rem;
+    font-weight: 400;
+  }
+
+  .decode-item {
+    background: var(--bg-elevated);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    white-space: nowrap;
+  }
+
+  /* Stats bar */
+  .stats {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    min-height: 1.2em;
+  }
+
+  /* Category groups */
+  .cat-group { margin-bottom: 1.75rem; }
+
+  .cat-heading {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Entry cards */
+  .entry {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.65rem;
+    box-shadow: var(--shadow);
+  }
+
+  .entry-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .entry-aliases {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+
+  .entry-aliases span {
+    background: var(--bg-chip);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    margin-right: 0.25rem;
+    display: inline-block;
+    margin-top: 0.2rem;
+  }
+
+  .entry-formula {
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    background: var(--formula-bg);
+    border: 1px solid var(--formula-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--formula-text);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.45;
+  }
+
+  .code-label {
+    margin-top: 0.7rem;
+    color: var(--accent);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .entry-sql {
+    margin-top: 0.25rem;
+    padding: 0.7rem 0.75rem;
+    background: #080b10;
+    border: 1px solid #283342;
+    border-radius: var(--radius-sm);
+    color: #d6deeb;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .sql-k { color: #ff7b72; }
+  .sql-f { color: #d2a8ff; }
+  .sql-s { color: #a5d6ff; }
+  .sql-n { color: #79c0ff; }
+  .sql-c { color: #8b949e; }
+
+  .entry-desc {
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .entry-gotcha {
+    margin-top: 0.6rem;
+    padding: 0.5rem 0.7rem;
+    background: var(--gotcha-bg);
+    border-left: 3px solid var(--gotcha);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .entry-gotcha strong {
+    color: var(--gotcha);
+    font-weight: 700;
+  }
+
+  .entry mark {
+    background: rgba(59, 130, 246, 0.35);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* Empty / no results */
+  .no-results {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .no-results p { margin-top: 0.4rem; font-size: 0.85rem; color: var(--text-dim); }
+
+  /* Footer */
+  .footer {
+    max-width: 720px;
+    margin: 1.5rem auto 0;
+    padding: 1rem 1rem 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* Hidden utility */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <h1 class="title">Insurance Metrics Glossary</h1>
+    <p class="subtitle">Formulas + plain English for data engineers</p>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+      </svg>
+      <input type="search" id="search" placeholder="Search terms, formulas, aliases…" autocomplete="off" enterkeyhint="search" aria-label="Search glossary">
+      <button type="button" id="clear-btn" aria-label="Clear search">&times;</button>
+    </div>
+    <div class="chips" id="chips" role="toolbar" aria-label="Category filters"></div>
+  </div>
+</header>
+
+<main class="main">
+  <aside class="decode" id="decode-card">
+    <h2>Decode checklist</h2>
+    <div class="decode-grid">
+      <span class="decode-item">gross</span><span class="sep">|</span>
+      <span class="decode-item">ceded</span><span class="sep">|</span>
+      <span class="decode-item">net</span>
+      <span class="sep">·</span>
+      <span class="decode-item">paid</span><span class="sep">|</span>
+      <span class="decode-item">case-incurred</span><span class="sep">|</span>
+      <span class="decode-item">ultimate</span>
+      <span class="sep">·</span>
+      <span class="decode-item">loss</span><span class="sep">|</span>
+      <span class="decode-item">LAE</span><span class="sep">|</span>
+      <span class="decode-item">both</span>
+      <span class="sep">·</span>
+      <span class="decode-item">±recoveries</span>
+      <span class="sep">·</span>
+      <span class="decode-item">AY</span><span class="sep">|</span>
+      <span class="decode-item">PY</span><span class="sep">|</span>
+      <span class="decode-item">CY</span>
+      <span class="sep">·</span>
+      <span class="decode-item">as-of</span>
+      <span class="sep">·</span>
+      <span class="decode-item">grain</span>
+    </div>
+  </aside>
+
+  <div class="stats" id="stats"></div>
+  <div id="results"></div>
+</main>
+
+<footer class="footer">
+  Personal study aid — company definitions may vary. Always confirm local definitions before using metrics in production pipelines or reports.
+</footer>
+
+<script>
+const CATEGORIES = [
+  { id: "loss", label: "Loss" },
+  { id: "reserves", label: "Reserves & IBNR" },
+  { id: "premium", label: "Premium" },
+  { id: "reinsurance", label: "Reinsurance" },
+  { id: "ratios", label: "Ratios" },
+  { id: "exposure", label: "Exposure" },
+  { id: "policy", label: "Policy & filters" },
+  { id: "decode", label: "Decode checklist" }
+];
+
+const ENTRIES = [
+  // ─── LOSS STACK ───
+  {
+    cat: "loss",
+    name: "Paid loss",
+    aliases: ["Paid indemnity", "Loss payments"],
+    formula: "paid_loss = sum of claim indemnity payments to date",
+    desc: "Cash actually paid to claimants for covered damages (indemnity only — excludes LAE). Cumulative as of an evaluation date.",
+    gotcha: "Confirm whether salvage/subrogation recoveries are already netted. Also confirm LAE is excluded."
+  },
+  {
+    cat: "loss",
+    name: "Paid LAE",
+    aliases: ["Paid loss adjustment expense", "Paid ALAE + ULAE"],
+    formula: "paid_lae = paid_alae + paid_ulae",
+    desc: "Expenses paid to investigate, defend, and settle claims. Split into ALAE (claim-specific) and ULAE (company-wide claims ops).",
+    gotcha: "Some systems fold ALAE into 'loss' and keep only ULAE separate — always check the column definition."
+  },
+  {
+    cat: "loss",
+    name: "Paid loss & LAE",
+    aliases: ["Paid L+LAE", "Paid loss and expense"],
+    formula: "paid_loss_lae = paid_loss + paid_lae",
+    desc: "Total cash out for claims: indemnity payments plus adjustment expenses, as of the evaluation date.",
+    gotcha: "The 'both' vs 'loss-only' distinction is one of the most common pipeline bugs. Check the Decode checklist."
+  },
+  {
+    cat: "loss",
+    name: "Case reserve / case outstanding",
+    aliases: ["Case O/S", "Outstanding reserve", "Case estimate"],
+    formula: "case_reserve = adjuster's estimated remaining unpaid on known claims",
+    desc: "The adjuster's current estimate of what is still owed on reported (open) claims. Does not include IBNR for unreported claims.",
+    gotcha: "Case reserve is a point-in-time estimate that changes with every re-evaluation. Not the same as total unpaid (which includes IBNR)."
+  },
+  {
+    cat: "loss",
+    name: "Case incurred",
+    aliases: ["Reported incurred", "Case-incurred loss", "Reported loss"],
+    formula: "case_incurred = paid + case_reserve",
+    desc: "What has been paid plus what is reserved on known claims. Also called 'reported incurred' — excludes IBNR.",
+    gotcha: "People say 'incurred' loosely. Ask: case-incurred (paid+case) or ultimate (paid+case+IBNR)?"
+  },
+  {
+    cat: "loss",
+    name: "Recoveries (salvage, subrogation)",
+    aliases: ["Salvage", "Subrogation", "Sal/sub", "SS recoveries"],
+    formula: "net_of_recoveries = gross_amount − salvage − subrogation",
+    desc: "Money recovered after paying a claim: salvage (selling damaged property) and subrogation (recovering from a liable third party).",
+    gotcha: "Recoveries can be booked against paid, case, or both. Confirm the sign convention and which layer they apply to."
+  },
+  {
+    cat: "loss",
+    name: "Net paid (of recoveries)",
+    aliases: ["Paid net of sal/sub", "Net paid loss"],
+    formula: "net_paid = paid − salvage − subrogation",
+    desc: "Paid amounts after subtracting salvage and subrogation recoveries. The 'economic' cash cost of claims so far.",
+    gotcha: "'Net' here means net of recoveries, NOT net of reinsurance. Overloaded word — see also Net (of reinsurance)."
+  },
+  {
+    cat: "loss",
+    name: "Net case incurred (of recoveries)",
+    aliases: ["Case incurred net of recoveries"],
+    formula: "net_case_incurred = (paid − recoveries) + (case_reserve − recovery_reserves)",
+    desc: "Case-incurred loss after netting salvage/subrogation already received and expected recovery reserves.",
+    gotcha: "Again: 'net' ≠ net of reinsurance. Specify 'net of recoveries' vs 'net of reinsurance' explicitly in column names."
+  },
+  {
+    cat: "loss",
+    name: "Ground-up loss",
+    aliases: ["GU loss", "Ground up", "From the ground up"],
+    formula: "ground_up = total loss before deductible / retention / reinsurance",
+    desc: "The full loss amount starting from zero, before applying deductibles, policyholder retentions, or reinsurance. Used especially in excess and reinsurance contexts.",
+    gotcha: "Ground-up ≠ gross. Gross usually means before reinsurance but after deductible; ground-up is before everything."
+  },
+  {
+    cat: "loss",
+    name: "Indemnity",
+    aliases: ["Indemnity loss", "Pure loss", "Damages"],
+    formula: null,
+    desc: "The portion of a claim payment that compensates the insured/claimant for covered damages — excludes all LAE. Synonymous with 'loss' when LAE is broken out separately.",
+    gotcha: "In some books 'loss' already means indemnity; in others 'loss' = loss + LAE. Always ask."
+  },
+  {
+    cat: "loss",
+    name: "ALAE",
+    aliases: ["Allocated Loss Adjustment Expense", "Allocated LAE"],
+    formula: "alae ⊂ lae  (claim-specific defense/adjusting costs)",
+    desc: "Claim-specific expenses that can be assigned to an individual claim: defense counsel, expert witnesses, independent adjusters, court costs.",
+    gotcha: "Some carriers include ALAE inside the 'loss' triangle and only reserve ULAE separately."
+  },
+  {
+    cat: "loss",
+    name: "ULAE",
+    aliases: ["Unallocated Loss Adjustment Expense", "Unallocated LAE"],
+    formula: "ulae ⊂ lae  (overhead claims-handling costs)",
+    desc: "Company-wide claims department costs that cannot be assigned to a single claim: staff salaries, claims systems, office overhead.",
+    gotcha: "ULAE is often estimated as a %, not tracked claim-by-claim. Triangles for ULAE may use different methods."
+  },
+  {
+    cat: "loss",
+    name: "LAE",
+    aliases: ["Loss Adjustment Expense", "Claims expense"],
+    formula: "lae = alae + ulae",
+    desc: "All costs of adjusting and settling claims. Sum of ALAE (allocated) and ULAE (unallocated).",
+    gotcha: "When a metric says 'loss & LAE' vs 'loss only', this is the difference. Confirm every time."
+  },
+
+  // ─── IBNR / TRIANGLES ───
+  {
+    cat: "reserves",
+    name: "IBNR",
+    aliases: ["Incurred But Not Reported", "Pure IBNR"],
+    formula: "ibnr = ultimate − case_incurred\n     = ultimate − (paid + case_reserve)",
+    desc: "Estimate of losses that have occurred but have not yet been reported to the insurer. Also sometimes used loosely to mean all bulk/development reserves.",
+    gotcha: "Narrow IBNR = unreported only. Broad IBNR (common usage) = IBNR + IBNER. Ask which."
+  },
+  {
+    cat: "reserves",
+    name: "IBNER",
+    aliases: ["Incurred But Not Enough Reported", "Development on known claims"],
+    formula: "ibner = expected_ultimate_on_reported − case_incurred",
+    desc: "Expected future development (up or down) on claims already reported — i.e., case reserves that are expected to prove inadequate or redundant.",
+    gotcha: "Often rolled into a single 'IBNR' number. Actuarial reports may split IBNR vs IBNER; data warehouses often don't."
+  },
+  {
+    cat: "reserves",
+    name: "Total reserve / unpaid",
+    aliases: ["Total unpaid", "Outstanding liability", "Unpaid loss"],
+    formula: "total_reserve = case_reserve + ibnr\n             = ultimate − paid",
+    desc: "Everything still expected to be paid: known case reserves plus IBNR (and IBNER). The unpaid portion of ultimate.",
+    gotcha: "Clarify loss-only vs loss+LAE, and gross vs net of reinsurance."
+  },
+  {
+    cat: "reserves",
+    name: "Ultimate loss",
+    aliases: ["Ultimate", "Projected ultimate", "Final loss"],
+    formula: "ultimate = paid + case_reserve + ibnr\n        = case_incurred + ibnr",
+    desc: "Best estimate of the total amount that will ultimately be paid for a cohort of claims (e.g., an accident year), once all are fully settled.",
+    gotcha: "Ultimate is an estimate that changes every evaluation. There is no single 'true' ultimate until all claims close — years later."
+  },
+  {
+    cat: "reserves",
+    name: "Incurred loss & LAE (ultimate)",
+    aliases: ["Ultimate L+LAE", "Incurred ultimate"],
+    formula: "ultimate_loss_lae = ultimate_loss + ultimate_lae",
+    desc: "Ultimate estimate including both indemnity and loss adjustment expenses. The full expected cost of the claims cohort.",
+    gotcha: "'Incurred' without qualifier is ambiguous — could mean case-incurred or ultimate. Prefer 'ultimate' or 'case incurred' in names."
+  },
+  {
+    cat: "reserves",
+    name: "Loss development triangle",
+    aliases: ["Triangle", "LDT", "Development triangle", "Age-to-age triangle"],
+    formula: "triangle[ay][dev_age] = cumulative paid or incurred as of that age",
+    desc: "A matrix of cumulative losses (paid or incurred) by origin period (rows, e.g. AY) and development age (columns). Used to estimate age-to-age factors and project ultimates.",
+    gotcha: "Confirm: paid vs incurred triangle, loss vs L+LAE, gross vs net, and the as-of date of the latest diagonal."
+  },
+  {
+    cat: "reserves",
+    name: "As-of / evaluation date",
+    aliases: ["Eval date", "Valuation date", "As-at date", "Accounting date"],
+    formula: null,
+    desc: "The snapshot date as of which paid, case reserves, and IBNR are measured. All cumulative figures are 'as of' this date.",
+    gotcha: "Mixing as-of dates across sources is a classic data bug. Always join/filter on a consistent evaluation date."
+  },
+  {
+    cat: "reserves",
+    name: "Accident year (AY)",
+    aliases: ["AY", "Occurrence year", "Loss year"],
+    formula: "ay = calendar year in which the loss event occurred",
+    desc: "Groups claims by the year the accident/occurrence happened, regardless of when reported or when the policy was written.",
+    gotcha: "AY ≠ policy year ≠ calendar year. Accident year is the default for most loss triangles in P&C."
+  },
+  {
+    cat: "reserves",
+    name: "Policy year (PY)",
+    aliases: ["PY", "Underwriting year", "UW year"],
+    formula: "py = year in which the policy incepted (or was written)",
+    desc: "Groups losses (and premium) by the year the policy was written/incepted. Common in reinsurance and some specialty lines.",
+    gotcha: "A PY cohort spans two calendar years of exposure for annual policies. Don't mix AY and PY triangles."
+  },
+  {
+    cat: "reserves",
+    name: "Calendar year (CY)",
+    aliases: ["CY", "Accounting year", "Fiscal year (if aligned)"],
+    formula: "cy_paid = payments made during the calendar year (any AY)\ncy_incurred = cy_paid + Δcase_reserve + Δibnr",
+    desc: "Groups transactions by the calendar/accounting year they were booked — not by when the accident occurred. Used for financial statements.",
+    gotcha: "CY incurred can be distorted by reserve changes on old years. AY is usually better for underwriting performance."
+  },
+  {
+    cat: "reserves",
+    name: "Report lag",
+    aliases: ["Reporting lag", "Lag", "Delay to report"],
+    formula: "report_lag = report_date − accident_date",
+    desc: "Time between when a loss occurs and when it is reported to the insurer. Drives pure IBNR.",
+    gotcha: "Long-tail lines (liability, workers' comp) have long report lags; short-tail (auto physical damage, property) are quick."
+  },
+  {
+    cat: "reserves",
+    name: "Development",
+    aliases: ["Loss development", "Age-to-age development", "CDF"],
+    formula: "age_to_age_factor = cum[age_n] / cum[age_n−1]\ncdf = product of remaining age-to-age factors\nultimate ≈ current_cum × cdf",
+    desc: "How reported/paid losses grow over time as claims mature. Measured with age-to-age (link) factors and cumulative development factors (CDFs).",
+    gotcha: "Development factors assume the past predicts the future. Regime changes (law, claims practices) break that assumption."
+  },
+
+  // ─── PREMIUM ───
+  {
+    cat: "premium",
+    name: "Gross Written Premium (GWP/GPW)",
+    aliases: ["GWP", "GPW", "Gross WP"],
+    formula: "gwp = direct_written + assumed_written",
+    desc: "Total premium written before deducting ceded reinsurance. Includes direct business plus any assumed reinsurance.",
+    gotcha: "GWP ≠ DWP. GWP includes assumed; DWP is direct only. Naming varies by company."
+  },
+  {
+    cat: "premium",
+    name: "Direct Written Premium (DWP)",
+    aliases: ["DWP", "Direct WP"],
+    formula: "dwp = premium written on policies issued directly to policyholders",
+    desc: "Premium from policies the company writes directly to insureds — excludes assumed reinsurance.",
+    gotcha: "DWP is before cessions. Net written = direct + assumed − ceded."
+  },
+  {
+    cat: "premium",
+    name: "Net Written Premium (NWP)",
+    aliases: ["NWP", "Net WP"],
+    formula: "nwp = gross_written − ceded_written\n    = direct_written + assumed_written − ceded_written",
+    desc: "Premium the company retains after ceding to reinsurers. The written premium that stays on the company's books.",
+    gotcha: "'Net' here = net of reinsurance. Unrelated to net-of-recoveries on the loss side."
+  },
+  {
+    cat: "premium",
+    name: "Written premium",
+    aliases: ["WP", "Premium written"],
+    formula: null,
+    desc: "Premium charged for policies bound/issued in a period, regardless of when it is earned. Can be gross, direct, or net — always qualify.",
+    gotcha: "Written ≠ earned. A full-year policy written on Dec 31 contributes almost nothing to that year's earned premium."
+  },
+  {
+    cat: "premium",
+    name: "Earned premium (GEP/EP)",
+    aliases: ["EP", "GEP", "Earned prem", "Gross earned premium"],
+    formula: "earned = written − Δunearned\n       ≈ pro-rata portion of written for the coverage period elapsed",
+    desc: "The portion of written premium that has been 'used up' as coverage has been provided over time. Matches losses for ratio calculations.",
+    gotcha: "Loss ratio uses earned, not written. Using written in a loss ratio is a common mistake."
+  },
+  {
+    cat: "premium",
+    name: "Unearned premium (UPR/UEP)",
+    aliases: ["UPR", "UEP", "Unearned premium reserve"],
+    formula: "upr = written − earned\n    = remaining pro-rata premium for unexpired coverage",
+    desc: "Liability representing premium received (or booked) for coverage not yet provided. Releases to earned as time passes (or on cancel).",
+    gotcha: "UPR is a balance-sheet reserve, not a P&L flow. ΔUPR bridges written ↔ earned."
+  },
+  {
+    cat: "premium",
+    name: "Inforce premium",
+    aliases: ["In-force premium", "IFP", "Premium in force"],
+    formula: "inforce ≈ annualized premium of currently active policies",
+    desc: "Snapshot of premium on policies that are active (in force) as of a date — often expressed as annualized written or full-term premium.",
+    gotcha: "Inforce is a stock (point-in-time), not a flow. Don't sum monthly inforce figures."
+  },
+  {
+    cat: "premium",
+    name: "Booked vs billed vs collected",
+    aliases: ["Written vs billed vs cash", "Premium recognition"],
+    formula: "booked (accrual) ≠ billed (invoice) ≠ collected (cash received)",
+    desc: "Three different recognition views: booked/written (accrual accounting), billed (invoices sent), collected (cash in the door). Timing and amounts diverge with installments, audits, and cancellations.",
+    gotcha: "Finance, actuarial, and billing teams may each use a different view. Align on which one your metric needs."
+  },
+  {
+    cat: "premium",
+    name: "Endorsement premium",
+    aliases: ["Endorsement", "Mid-term adjustment", "Policy change premium"],
+    formula: "endorsement_prem = pro-rata premium change for mid-term endorsement",
+    desc: "Additional or return premium from a mid-term policy change (adding a vehicle, increasing limits, changing address, etc.).",
+    gotcha: "Endorsements adjust both written and unearned. Effective date of the endorsement drives the earning pattern."
+  },
+  {
+    cat: "premium",
+    name: "Audit premium",
+    aliases: ["Premium audit", "Final audit", "Exposure audit"],
+    formula: "audit_prem = final_premium − deposit/estimated_premium",
+    desc: "True-up premium after an audit of actual exposure (e.g., payroll, sales, vehicle count) versus the estimated exposure used at inception.",
+    gotcha: "Audit premium can be booked long after the policy term. It can distort CY written and earned if not attributed carefully."
+  },
+  {
+    cat: "premium",
+    name: "Cancellations / flat cancel",
+    aliases: ["Cancel", "Flat cancellation", "Pro-rata cancel", "Short-rate cancel"],
+    formula: "return_premium ≈ unearned (pro-rata) or short-rate schedule",
+    desc: "Termination of a policy before expiration. Flat cancel = cancel from inception (as if never written). Pro-rata returns unearned; short-rate applies a penalty.",
+    gotcha: "Flat cancels should reverse written entirely. Partial-term cancels reduce written and release UPR. Timing of the cancel transaction matters for CY stats."
+  },
+
+  // ─── REINSURANCE ───
+  {
+    cat: "reinsurance",
+    name: "Gross",
+    aliases: ["Gross of reinsurance", "Before ceded"],
+    formula: "gross = direct + assumed   (before cessions)",
+    desc: "Amounts before deducting reinsurance cessions. For a primary insurer: usually direct (and any assumed) before ceded.",
+    gotcha: "Gross ≠ ground-up. Gross is before reinsurance; ground-up is before deductible/retention too."
+  },
+  {
+    cat: "reinsurance",
+    name: "Ceded",
+    aliases: ["Ceded to reinsurers", "Cession"],
+    formula: "ceded = portion transferred to reinsurers",
+    desc: "Premium, losses, or reserves transferred (ceded) to reinsurers under treaty or facultative contracts.",
+    gotcha: "Ceded is a positive quantity that is subtracted: net = gross − ceded. Sign conventions in databases vary — check."
+  },
+  {
+    cat: "reinsurance",
+    name: "Net (of reinsurance)",
+    aliases: ["Net retained", "Net of RI", "Retained"],
+    formula: "net = gross − ceded\n(applies to written, earned, paid, case, ultimate, reserves)",
+    desc: "What the insurer keeps after ceding to reinsurers. The fundamental reinsurance identity: net = gross − ceded.",
+    gotcha: "OVERLOADED: 'net' can also mean net of recoveries (salvage/subro). Always say 'net of reinsurance' or 'net of recoveries'."
+  },
+  {
+    cat: "reinsurance",
+    name: "Assumed",
+    aliases: ["Assumed reinsurance", "Inward reinsurance"],
+    formula: "gross_written = direct_written + assumed_written",
+    desc: "Business the company takes on as a reinsurer — accepting risk from another insurer (cedant).",
+    gotcha: "Assumed losses/premium sit on the gross side. A company can be both a cedant and an assuming reinsurer."
+  },
+  {
+    cat: "reinsurance",
+    name: "Direct",
+    aliases: ["Direct business", "Primary business"],
+    formula: "direct = business written directly to policyholders (not assumed)",
+    desc: "Insurance written directly between the insurer and the policyholder, as opposed to assumed reinsurance.",
+    gotcha: "Direct ≠ gross. Gross = direct + assumed. Net = gross − ceded."
+  },
+  {
+    cat: "reinsurance",
+    name: "Retention (reinsurance)",
+    aliases: ["Reinsurance retention", "Net retention", "Company retention"],
+    formula: "retention = amount/layer the cedant keeps before reinsurance attaches",
+    desc: "In reinsurance: the portion of risk the cedant retains (keeps) before the reinsurer's coverage begins. Can be a dollar amount (XOL) or a share (quota share).",
+    gotcha: "OVERLOADED WORD: 'retention' also means policy renewal retention (book retention). Context is everything — see Retention (policy)."
+  },
+  {
+    cat: "reinsurance",
+    name: "Attachment / priority",
+    aliases: ["Attachment point", "Priority", "Threshold", "Retention point"],
+    formula: "reinsurer pays when ground_up (or subject) loss > attachment",
+    desc: "The loss level at which an excess-of-loss reinsurance layer begins to respond. Also called priority (esp. in London market).",
+    gotcha: "Confirm whether attachment is ground-up or excess of underlying layers / deductible."
+  },
+  {
+    cat: "reinsurance",
+    name: "Limit / layer",
+    aliases: ["Reinsurance limit", "Layer", "XS layer", "xs of"],
+    formula: "layer = limit xs attachment\ne.g. 10M xs 5M  →  pays up to 10M once loss exceeds 5M",
+    desc: "The maximum the reinsurer will pay for a layer, expressed as 'limit excess of attachment' (e.g., $10M xs $5M).",
+    gotcha: "Layer limits may be per occurrence, per aggregate, or both. Check reinstatement provisions."
+  },
+  {
+    cat: "reinsurance",
+    name: "Quota share",
+    aliases: ["QS", "Quota share treaty", "Proportional share"],
+    formula: "ceded = qs_pct × subject\ncedant_keeps = (1 − qs_pct) × subject",
+    desc: "Proportional reinsurance where the reinsurer takes a fixed percentage of every risk (premium and losses) in the subject portfolio.",
+    gotcha: "Ceding commission is typically paid by the reinsurer back to the cedant on QS deals."
+  },
+  {
+    cat: "reinsurance",
+    name: "Surplus share",
+    aliases: ["Surplus", "Surplus treaty"],
+    formula: "ceded_share = max(0, (TIV_or_limit − retention) / TIV_or_limit)",
+    desc: "Proportional reinsurance where the cedant retains a fixed dollar retention per risk and cedes the 'surplus' above that, up to a stated number of lines.",
+    gotcha: "Unlike QS, the cession % varies by risk size. Small risks may be 100% retained."
+  },
+  {
+    cat: "reinsurance",
+    name: "Excess of loss (XOL)",
+    aliases: ["XOL", "XL", "Excess of loss", "Non-proportional"],
+    formula: "reinsurer_pays = min(limit, max(0, loss − attachment))",
+    desc: "Non-proportional reinsurance that pays when a loss (per risk, per occurrence, or aggregate) exceeds the attachment point, up to the layer limit.",
+    gotcha: "XOL can be risk XL, catastrophe (cat) XL, or aggregate XL — different triggers and subject definitions."
+  },
+  {
+    cat: "reinsurance",
+    name: "Treaty",
+    aliases: ["Treaty reinsurance", "Obligatory treaty"],
+    formula: null,
+    desc: "A standing reinsurance contract covering a defined book/class of business automatically (obligatory cessions within the scope).",
+    gotcha: "Treaty vs facultative is about how risks are ceded (automatic book vs individual risk), not proportional vs non-proportional."
+  },
+  {
+    cat: "reinsurance",
+    name: "Facultative",
+    aliases: ["Fac", "Facultative reinsurance"],
+    formula: null,
+    desc: "Reinsurance of an individual risk, negotiated case by case. The reinsurer can accept or decline each offering.",
+    gotcha: "Fac is used for large/unusual risks that don't fit treaty terms, or to capacity-top a treaty."
+  },
+  {
+    cat: "reinsurance",
+    name: "Proportional vs non-proportional",
+    aliases: ["Pro-rata vs excess", "QS/surplus vs XOL"],
+    formula: "proportional: share of premium & loss (QS, surplus)\nnon-proportional: pays only above attachment (XOL)",
+    desc: "Two families of reinsurance. Proportional shares premium and losses by percentage. Non-proportional (excess) responds only when losses exceed a threshold.",
+    gotcha: "A program often stacks both: e.g., QS on the ground plus XOL above a retained amount."
+  },
+  {
+    cat: "reinsurance",
+    name: "Ceding commission",
+    aliases: ["Ceding comm", "Override", "RI commission"],
+    formula: "ceding_commission = commission_rate × ceded_premium",
+    desc: "Commission the reinsurer pays the cedant on proportional business, compensating the cedant for acquisition costs and sometimes providing profit share.",
+    gotcha: "Affects net earned premium and expense ratios. Sliding-scale commissions depend on loss experience."
+  },
+  {
+    cat: "reinsurance",
+    name: "Reinsurance recoverable",
+    aliases: ["RI recoverable", "Ceded recoverable", "Reinsurance receivable"],
+    formula: "ri_recoverable ≈ ceded unpaid (case + ibnr) + ceded paid not yet collected",
+    desc: "Amounts due (or expected) from reinsurers for losses and LAE already incurred. An asset on the cedant's balance sheet.",
+    gotcha: "Credit risk matters — recoverables from weak reinsurers may need impairment. Timing: billed vs accrued recoverable."
+  },
+  {
+    cat: "reinsurance",
+    name: "Reinstatement",
+    aliases: ["Reinstatement premium", "Reinstatement of limit"],
+    formula: "reinstatement_premium ≈ pro-rata × original_layer_premium × (loss_used / limit)",
+    desc: "Provision that restores a used-up XOL limit (after a loss) for future events, usually in exchange for an additional reinstatement premium.",
+    gotcha: "Number of reinstatements is finite (e.g., 'one free reinstatement'). After exhaustion, no more cover until next period."
+  },
+  {
+    cat: "reinsurance",
+    name: "Bordereau",
+    aliases: ["Bdx", "Bordereaux", "Premium/loss bordereau"],
+    formula: null,
+    desc: "Detailed periodic report (often spreadsheet/EDI) from cedant to reinsurer listing premiums, claims, and exposures under a treaty — the operational data feed for reinsurance accounting.",
+    gotcha: "Bordereau grain and timing drive RI data quality. Late or incomplete bdx is a common source of RI reconciliation breaks."
+  },
+
+  // ─── RATIOS ───
+  {
+    cat: "ratios",
+    name: "Loss ratio",
+    aliases: ["LR", "Claim ratio"],
+    formula: "loss_ratio = incurred_loss / earned_premium\n(often × 100 for percent)",
+    desc: "Core profitability metric: how much of earned premium is consumed by losses (and sometimes LAE). Lower is better.",
+    gotcha: "Specify: calendar-year vs accident-year; loss-only vs L+LAE; gross vs net; case-incurred vs ultimate."
+  },
+  {
+    cat: "ratios",
+    name: "Expense ratio",
+    aliases: ["ER", "Underwriting expense ratio"],
+    formula: "expense_ratio = underwriting_expenses / written_premium\n(sometimes / earned_premium — confirm)",
+    desc: "Underwriting and acquisition expenses as a share of premium. Includes commissions, overhead, premium taxes — usually excludes LAE.",
+    gotcha: "Denominator is often written (not earned). LAE belongs in the loss ratio side, not expense ratio, in standard combined-ratio math."
+  },
+  {
+    cat: "ratios",
+    name: "Combined ratio",
+    aliases: ["CR", "Combined", "Underwriting ratio"],
+    formula: "combined_ratio = loss_ratio + expense_ratio\n(< 100% = underwriting profit)",
+    desc: "Sum of loss ratio and expense ratio. Below 100% means underwriting profit (before investment income); above means underwriting loss.",
+    gotcha: "Confirm both component definitions match (same gross/net, same period basis). Trade combined vs statutory can differ."
+  },
+  {
+    cat: "ratios",
+    name: "Frequency",
+    aliases: ["Claim frequency", "Freq"],
+    formula: "frequency = number_of_claims / exposure\n(e.g. claims per car-year)",
+    desc: "How often claims occur, relative to exposure. One half of the pure-premium decomposition.",
+    gotcha: "Define what counts as a 'claim' (FNOL vs paid vs above deductible). Exposure units must match."
+  },
+  {
+    cat: "ratios",
+    name: "Severity",
+    aliases: ["Claim severity", "Sev", "Average claim cost"],
+    formula: "severity = total_loss / number_of_claims",
+    desc: "Average cost per claim. The other half of pure premium: pure_premium ≈ frequency × severity.",
+    gotcha: "Severity depends on whether you include $0/closed-without-pay claims and whether LAE is included."
+  },
+  {
+    cat: "ratios",
+    name: "Pure premium",
+    aliases: ["Loss cost", "Pure prem"],
+    formula: "pure_premium = incurred_loss / exposure\n             ≈ frequency × severity",
+    desc: "Expected loss cost per unit of exposure, before expenses and profit load. Foundation of pricing.",
+    gotcha: "Not the same as the premium charged to the customer (which loads expenses, profit, and sometimes contingency)."
+  },
+  {
+    cat: "ratios",
+    name: "Hit ratio / close ratio",
+    aliases: ["Hit rate", "Close rate", "Quote-to-bind", "Bind ratio"],
+    formula: "hit_ratio = bound_policies / quotes_issued\n(or / submissions — define the funnel step)",
+    desc: "Conversion rate from quotes (or submissions) to bound policies. Measures underwriting/sales effectiveness.",
+    gotcha: "Denominator varies: submissions vs quotes vs indicated quotes. Define the funnel clearly."
+  },
+  {
+    cat: "ratios",
+    name: "Book retention / premium retention",
+    aliases: ["Renewal retention", "Policy retention", "Premium persistency"],
+    formula: "book_retention = renewed_premium / expiring_premium\n(or count-based: renewed_policies / expiring_policies)",
+    desc: "Share of expiring book that renews. A growth and profitability lever — acquiring is costlier than retaining.",
+    gotcha: "OVERLOADED: this 'retention' is about renewals, not reinsurance retention. See also Retention (reinsurance) and Retention (policy)."
+  },
+
+  // ─── EXPOSURE & LIMITS ───
+  {
+    cat: "exposure",
+    name: "Exposure",
+    aliases: ["Exposure base", "Exposure units", "Earned exposure"],
+    formula: "depends on LOB: car-years, house-years, payroll ($), sales ($), TIV, etc.",
+    desc: "The measure of risk volume used for pricing and frequency/severity. Must match the line of business.",
+    gotcha: "Written exposure vs earned exposure mirrors written vs earned premium. Use earned exposure with incurred losses."
+  },
+  {
+    cat: "exposure",
+    name: "Deductible",
+    aliases: ["Ded", "Retention (policy)", "Self-insured retention (SIR)"],
+    formula: "insurer_pays = max(0, ground_up_loss − deductible)  (up to limit)",
+    desc: "Amount the insured pays first on a loss before the insurer responds. Reduces frequency of small claims and premium.",
+    gotcha: "Deductible vs SIR: SIR often means the insured pays and insurer sits excess; deductible may be subtracted from the limit. Check policy wording."
+  },
+  {
+    cat: "exposure",
+    name: "Policy limit",
+    aliases: ["Limit", "Limit of liability", "Coverage limit"],
+    formula: "insurer_max = policy_limit  (per occurrence / aggregate as specified)",
+    desc: "Maximum the insurer will pay under the policy for a covered loss (per occurrence, per person, and/or in aggregate).",
+    gotcha: "Limits can stack (primary + umbrella). Confirm occurrence vs aggregate and whether defense costs erode the limit."
+  },
+  {
+    cat: "exposure",
+    name: "TIV",
+    aliases: ["Total Insured Value", "Total Insurable Value", "Sum insured"],
+    formula: "tiv = total value of insured property / subject matter",
+    desc: "Aggregate value of property or interests covered by the policy. Key exposure base for property and some specialty lines.",
+    gotcha: "TIV may be reported, scheduled, or appraisal-based. Underinsurance (TIV < actual value) creates coinsurance issues."
+  },
+  {
+    cat: "exposure",
+    name: "Subject loss",
+    aliases: ["Subject", "Subject matter loss", "Covered loss base"],
+    formula: "subject_loss = loss amount to which reinsurance terms apply",
+    desc: "In reinsurance, the loss (or premium) base to which cession terms attach — after applying underlying deductibles, exclusions, and inuring reinsurance as defined in the contract.",
+    gotcha: "Subject definition is contract-specific. Getting subject wrong breaks ceded calculations."
+  },
+  {
+    cat: "exposure",
+    name: "Car-years / house-years / payroll exposure",
+    aliases: ["Car-year", "House-year", "Payroll", "Exposure examples"],
+    formula: "car_years = Σ (vehicle_days_inforce / 365)\nhouse_years = Σ (property_days_inforce / 365)\npayroll_exposure = covered payroll ($)",
+    desc: "Common exposure units: auto uses car-years (one car insured for one year), homeowners use house-years, workers' comp uses payroll dollars.",
+    gotcha: "Partial-term policies need day-count pro-rating. Earned exposure, not just inforce count, for loss analyses."
+  },
+
+  // ─── POLICY / FILTERS ───
+  {
+    cat: "policy",
+    name: "FNOL",
+    aliases: ["First Notice of Loss", "First report", "Claim notice"],
+    formula: null,
+    desc: "The first notification that a loss has occurred — starts the claims process. Report date is typically the FNOL date.",
+    gotcha: "FNOL date ≠ accident date. Report lag = FNOL − accident. Some systems have separate notice vs setup dates."
+  },
+  {
+    cat: "policy",
+    name: "Claimant vs insured / policyholder",
+    aliases: ["Claimant", "Insured", "Policyholder", "Named insured"],
+    formula: null,
+    desc: "Policyholder/insured = the party who bought the policy. Claimant = the party seeking payment (may be the insured, or a third party in liability claims).",
+    gotcha: "One claim can have multiple claimants. Don't assume 1:1 claim↔claimant when counting severity/frequency."
+  },
+  {
+    cat: "policy",
+    name: "Adjuster",
+    aliases: ["Claims adjuster", "IA", "Independent adjuster", "Staff adjuster"],
+    formula: null,
+    desc: "Person who investigates, evaluates, and settles claims. Staff adjusters are employees; independent adjusters (IAs) are contractors.",
+    gotcha: "Adjuster assignments change; case reserve 'owner' may differ from the original FNOL handler."
+  },
+  {
+    cat: "policy",
+    name: "Coverage",
+    aliases: ["Coverage part", "Coverage type", "Peril / coverage code"],
+    formula: null,
+    desc: "The specific protection under a policy (e.g., BI, PD, collision, comprehensive, GL premises). Claims and premium often roll up by coverage.",
+    gotcha: "Coverage hierarchies differ by LOB and company. A 'claim' may span multiple coverages."
+  },
+  {
+    cat: "policy",
+    name: "New business vs renewal",
+    aliases: ["NB", "RN", "New vs renew"],
+    formula: null,
+    desc: "New business = first-time policy with the carrier (or after a lapse). Renewal = continuation of an expiring policy for a new term.",
+    gotcha: "Rewrite after cancel, book-roll, and agency transfer blur NB vs RN. Define explicitly for hit-ratio and retention metrics."
+  },
+  {
+    cat: "policy",
+    name: "Inforce",
+    aliases: ["In force", "Active policy", "In-force count"],
+    formula: "inforce = policies with effective_date ≤ as_of AND (expiration > as_of) AND not cancelled",
+    desc: "Policies that are currently active as of a given date — coverage is in effect.",
+    gotcha: "Inforce is a point-in-time snapshot. Specify as-of date and whether pending cancels / bound-not-issued are included."
+  },
+  {
+    cat: "policy",
+    name: "Bound vs issued",
+    aliases: ["Binder", "Bound", "Issued", "Policy issuance"],
+    formula: null,
+    desc: "Bound = coverage agreed and effective (often via binder) before the formal policy document is produced. Issued = policy document generated and released.",
+    gotcha: "Written premium timing may follow bind date or issue date depending on the company. Gaps create reconciliation noise."
+  },
+  {
+    cat: "policy",
+    name: "LOB",
+    aliases: ["Line of business", "Product line", "Class of business"],
+    formula: null,
+    desc: "Categorization of insurance products (e.g., personal auto, homeowners, workers' comp, general liability, commercial property).",
+    gotcha: "LOB taxonomies differ (statutory NAIC lines vs management product hierarchy). Map carefully across systems."
+  },
+  {
+    cat: "policy",
+    name: "Channel / producer",
+    aliases: ["Distribution channel", "Agent", "Broker", "Producer code", "Agency"],
+    formula: null,
+    desc: "How business is acquired: captive agents, independent agents, brokers, direct-to-consumer, MGAs, etc. Producer is the licensed intermediary.",
+    gotcha: "Producer hierarchies (agent → agency → region) matter for rollups. Book transfers change producer on inforce policies."
+  },
+  {
+    cat: "policy",
+    name: "Retention (policy)",
+    aliases: ["Policy retention", "Insured retention", "Deductible / SIR"],
+    formula: null,
+    desc: "At the policy level, 'retention' often means the amount the insured keeps (deductible or self-insured retention) before insurance responds.",
+    gotcha: "THREE meanings of retention: (1) insured's deductible/SIR, (2) reinsurance amount cedant keeps, (3) renewal/book retention rate. Disambiguate every time."
+  },
+
+  // ─── DECODE / OVERLOADED TERMS ───
+  {
+    cat: "decode",
+    name: "Overloaded: \"net\"",
+    aliases: ["Net ambiguity", "Net of what?"],
+    formula: "net_of_reinsurance = gross − ceded\nnet_of_recoveries  = gross_loss − salvage − subrogation",
+    desc: "The word 'net' is dangerously overloaded in insurance data. Most often it means net of reinsurance, but it also commonly means net of salvage/subrogation recoveries. A column named simply 'net_paid' is ambiguous.",
+    gotcha: "DE rule: never use bare 'net' in column names. Prefer net_of_ri_paid or paid_net_of_recoveries. Ask 'net of what?' every time."
+  },
+  {
+    cat: "decode",
+    name: "Overloaded: \"retention\"",
+    aliases: ["Retention ambiguity"],
+    formula: null,
+    desc: "Retention has at least three meanings: (1) policy deductible / SIR the insured keeps, (2) reinsurance retention the cedant keeps before cession, (3) book/renewal retention rate (% of expiring premium that renews).",
+    gotcha: "DE rule: qualify — policy_retention_deductible, ri_retention, book_retention_rate. Context from surrounding fields usually resolves it."
+  },
+  {
+    cat: "decode",
+    name: "Decode checklist (full)",
+    aliases: ["Metric decode", "Definition checklist", "Questions to ask"],
+    formula: "gross|ceded|net · paid|case-incurred|ultimate · loss|LAE|both · ±recoveries · AY|PY|CY · as-of · grain",
+    desc: "Before trusting any insurance metric, decode it along these axes: reinsurance basis (gross/ceded/net), maturity (paid / case-incurred / ultimate), loss scope (loss / LAE / both), recoveries (±sal/sub), cohort basis (AY/PY/CY), evaluation as-of date, and grain (claim / policy / AY / LOB / …).",
+    gotcha: "Skipping any axis is how silent metric bugs ship. Pin this checklist next to every new pipeline column."
+  }
+];
+
+// ─── App logic ───
+const searchEl = document.getElementById("search");
+const clearBtn = document.getElementById("clear-btn");
+const chipsEl = document.getElementById("chips");
+const resultsEl = document.getElementById("results");
+const statsEl = document.getElementById("stats");
+
+let activeCat = null; // null = all
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function highlight(text, query) {
+  if (!query || !text) return escapeHtml(text || "");
+  const esc = escapeHtml(text);
+  const q = query.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (!q) return esc;
+  const re = new RegExp("(" + q + ")", "gi");
+  return esc.replace(re, "<mark>$1</mark>");
+}
+
+function entrySearchBlob(e) {
+  return [
+    e.name,
+    (e.aliases || []).join(" "),
+    e.formula || "",
+    e.desc || "",
+    e.gotcha || "",
+    e.cat,
+    (CATEGORIES.find(c => c.id === e.cat) || {}).label || ""
+  ].join(" ").toLowerCase();
+}
+
+function matches(e, query, cat) {
+  if (cat && e.cat !== cat) return false;
+  if (!query) return true;
+  return entrySearchBlob(e).includes(query.toLowerCase());
+}
+
+function renderChips() {
+  const allChip = document.createElement("button");
+  allChip.type = "button";
+  allChip.className = "chip" + (activeCat === null ? " active" : "");
+  allChip.textContent = "All";
+  allChip.setAttribute("aria-pressed", activeCat === null ? "true" : "false");
+  allChip.addEventListener("click", () => { activeCat = null; render(); });
+  chipsEl.appendChild(allChip);
+
+  CATEGORIES.forEach(c => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip" + (activeCat === c.id ? " active" : "");
+    btn.textContent = c.label;
+    btn.setAttribute("aria-pressed", activeCat === c.id ? "true" : "false");
+    btn.addEventListener("click", () => {
+      activeCat = activeCat === c.id ? null : c.id;
+      render();
+    });
+    chipsEl.appendChild(btn);
+  });
+}
+
+function sqlExample(e) {
+  const n = e.name.toLowerCase();
+  const examples = {
+    "paid loss": `SELECT SUM(indemnity_paid) AS paid_loss\nFROM claim_payment\nWHERE payment_date <= :as_of_date;`,
+    "paid lae": `SELECT SUM(alae_paid + ulae_paid) AS paid_lae\nFROM claim_expense_payment\nWHERE payment_date <= :as_of_date;`,
+    "paid loss & lae": `SELECT SUM(indemnity_paid + alae_paid + ulae_paid) AS paid_loss_lae\nFROM claim_payment\nWHERE payment_date <= :as_of_date;`,
+    "case reserve / case outstanding": `SELECT SUM(case_reserve) AS case_reserve\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "case incurred": `SELECT SUM(indemnity_paid + case_reserve) AS case_incurred\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "net paid (of recoveries)": `SELECT SUM(paid_loss - salvage - subrogation) AS net_paid\nFROM claim_snapshot\nWHERE snapshot_date = :as_of_date;`,
+    "ultimate loss": `SELECT SUM(paid_loss + case_reserve + ibnr) AS ultimate_loss\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "total unpaid / outstanding": `SELECT SUM(case_reserve + ibnr) AS total_unpaid\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "gross / ceded / net": `SELECT gross_loss, ceded_loss,\n       gross_loss - ceded_loss AS net_loss\nFROM loss_valuation\nWHERE evaluation_date = :as_of_date;`,
+    "net written premium": `SELECT gross_written_premium - ceded_written_premium\n       AS net_written_premium\nFROM premium_fact;`,
+    "net earned premium": `SELECT gross_earned_premium - ceded_earned_premium\n       AS net_earned_premium\nFROM premium_fact;`,
+    "loss ratio": `SELECT SUM(incurred_loss) / NULLIF(SUM(earned_premium), 0)\n       AS loss_ratio\nFROM insurance_monthly;`,
+    "frequency": `SELECT COUNT(DISTINCT claim_id) / NULLIF(SUM(exposure), 0)\n       AS frequency\nFROM claim_fact;`,
+    "severity": `SELECT SUM(incurred_loss) / NULLIF(COUNT(DISTINCT claim_id), 0)\n       AS severity\nFROM claim_fact;`,
+    "pure premium": `SELECT SUM(incurred_loss) / NULLIF(SUM(exposure), 0)\n       AS pure_premium\nFROM insurance_monthly;`,
+    "combined ratio": `SELECT (SUM(incurred_loss_lae) + SUM(underwriting_expense))\n       / NULLIF(SUM(earned_premium), 0) AS combined_ratio\nFROM insurance_monthly;`,
+    "inforce": `SELECT COUNT(DISTINCT policy_id) AS inforce_policies\nFROM policy_snapshot\nWHERE effective_date <= :as_of_date\n  AND expiration_date > :as_of_date\n  AND cancelled_flag = 0;`
+  };
+  return examples[n] || (e.formula ? `-- Illustrative grain: ${e.name}\nSELECT ${e.formula.split("=")[0].trim() || "metric"}\nFROM insurance_fact\nWHERE evaluation_date = :as_of_date;` : null);
+}
+
+function sqlHighlight(text) {
+  let s = escapeHtml(text);
+  s = s.replace(/(--[^\n]*)/g, '<span class="sql-c">$1</span>');
+  s = s.replace(/('(?:''|[^'])*')/g, '<span class="sql-s">$1</span>');
+  s = s.replace(/\b(SELECT|FROM|WHERE|AND|OR|AS|NULLIF|SUM|COUNT|DISTINCT|CASE|WHEN|THEN|ELSE|END)\b/gi, '<span class="sql-k">$1</span>');
+  s = s.replace(/\b(SUM|COUNT|NULLIF)\b/gi, '<span class="sql-f">$1</span>');
+  s = s.replace(/(:[a-z_]+)/gi, '<span class="sql-n">$1</span>');
+  return s;
+}
+
+function renderEntry(e, query) {
+  const aliases = (e.aliases || []).map(a =>
+    `<span>${highlight(a, query)}</span>`
+  ).join("");
+
+  const sql = sqlExample(e);
+  return `<article class="entry" data-cat="${escapeHtml(e.cat)}">
+    <div class="entry-name">${highlight(e.name, query)}</div>
+    ${aliases ? `<div class="entry-aliases">${aliases}</div>` : ""}
+    ${e.formula ? `<div class="entry-formula">${highlight(e.formula, query)}</div>` : ""}
+    ${sql ? `<div class="code-label">SQL example</div><pre class="entry-sql">${sqlHighlight(sql)}</pre>` : ""}
+    <div class="entry-desc">${highlight(e.desc, query)}</div>
+    ${e.gotcha ? `<div class="entry-gotcha"><strong>DE gotcha:</strong> ${highlight(e.gotcha, query)}</div>` : ""}
+  </article>`;
+}
+
+function render() {
+  const query = searchEl.value.trim();
+  clearBtn.classList.toggle("visible", query.length > 0);
+
+  // Rebuild chips to update active state
+  chipsEl.innerHTML = "";
+  renderChips();
+
+  const filtered = ENTRIES.filter(e => matches(e, query, activeCat));
+
+  if (filtered.length === 0) {
+    statsEl.textContent = "No matches";
+    resultsEl.innerHTML = `<div class="no-results">No terms match your search.<p>Try another keyword or clear filters.</p></div>`;
+    return;
+  }
+
+  // Group by category (preserve CATEGORIES order)
+  const byCat = {};
+  filtered.forEach(e => {
+    if (!byCat[e.cat]) byCat[e.cat] = [];
+    byCat[e.cat].push(e);
+  });
+
+  let html = "";
+  CATEGORIES.forEach(c => {
+    const list = byCat[c.id];
+    if (!list || !list.length) return;
+    html += `<section class="cat-group">
+      <h2 class="cat-heading">${escapeHtml(c.label)} · ${list.length}</h2>
+      ${list.map(e => renderEntry(e, query)).join("")}
+    </section>`;
+  });
+
+  const total = ENTRIES.length;
+  if (query || activeCat) {
+    statsEl.textContent = `Showing ${filtered.length} of ${total} terms`;
+  } else {
+    statsEl.textContent = `${total} terms`;
+  }
+
+  resultsEl.innerHTML = html;
+}
+
+searchEl.addEventListener("input", render);
+clearBtn.addEventListener("click", () => {
+  searchEl.value = "";
+  searchEl.focus();
+  render();
+});
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") {
+    if (searchEl.value || activeCat) {
+      searchEl.value = "";
+      activeCat = null;
+      render();
+      searchEl.blur();
+    }
+  }
+});
+
+render();
+</script>
+</body>
+</html>
