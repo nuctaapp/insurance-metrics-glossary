@@ -1134,6 +1134,27 @@ function matches(e, query, cat) {
   return entrySearchBlob(e).includes(query.toLowerCase());
 }
 
+// Search ranking: exact title first, then title starts-with/contains,
+// followed by aliases, formulas, descriptions, and category text.
+function searchScore(e, query) {
+  if (!query) return 0;
+  const q = query.toLowerCase().trim();
+  const name = (e.name || "").toLowerCase();
+  const aliases = (e.aliases || []).join(" ").toLowerCase();
+  const formula = (e.formula || "").toLowerCase();
+  const desc = (e.desc || "").toLowerCase();
+  const gotcha = (e.gotcha || "").toLowerCase();
+
+  if (name === q) return 1000;
+  if (name.startsWith(q)) return 900;
+  if (name.includes(q)) return 800;
+  if (aliases.includes(q)) return 700;
+  if (formula.includes(q)) return 600;
+  if (desc.includes(q)) return 500;
+  if (gotcha.includes(q)) return 400;
+  return 100;
+}
+
 function renderChips() {
   const allChip = document.createElement("button");
   allChip.type = "button";
@@ -1235,7 +1256,9 @@ function render() {
   chipsEl.innerHTML = "";
   renderChips();
 
-  const filtered = ENTRIES.filter(e => matches(e, query, activeCat));
+  const filtered = ENTRIES
+    .filter(e => matches(e, query, activeCat))
+    .sort((a, b) => searchScore(b, query) - searchScore(a, query));
 
   if (filtered.length === 0) {
     statsEl.textContent = "No matches";
@@ -1251,7 +1274,14 @@ function render() {
   });
 
   let html = "";
-  CATEGORIES.forEach(c => {
+  const categoryOrder = query
+    ? [...CATEGORIES].sort((a, b) => {
+        const aBest = Math.max(...(byCat[a.id] || []).map(e => searchScore(e, query)), -1);
+        const bBest = Math.max(...(byCat[b.id] || []).map(e => searchScore(e, query)), -1);
+        return bBest - aBest;
+      })
+    : CATEGORIES;
+  categoryOrder.forEach(c => {
     const list = byCat[c.id];
     if (!list || !list.length) return;
     html += `<section class="cat-group">
